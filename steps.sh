@@ -17,6 +17,10 @@ kubectl apply -f k8s/metrics-server/
 
 kubectl apply -f dashboard/
 
+#ALB INGRESS CONTROLLER 
+
+kubectl apply -f k8s/alb-ingress/
+
 #Jenkins Setup 
 
 #helm install --name cicd stable/jenkins --set rbac.create=true,master.servicePort=80,master.serviceType=LoadBalancer

@@ -25,8 +25,26 @@ halyard:
     ## Uncomment if you want to use a pre-created secret rather than feeding data in via helm.
     # name:
   additionalConfigMaps:
-    create: false
-    data: {}
+    create: yes
+    data:
+      hal_config.src: |-
+        AWS_ACCOUNT=164366481040
+        AWS_REGION=us-west-2
+  additionalScripts:
+    create: true
+    data:
+      hal_config.sh: |
+        # source env vars set in configmap
+        source /opt/halyard/additionalConfigMaps/hal_config.src
+        ECR_ADDRESS=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+        # config ecr provider
+        ${HAL_COMMAND} config provider docker-registry account add only_k8s  \
+          --address ${ECR_ADDRESS} \
+          --username AWS \
+          --password-command "aws --region ${AWS_REGION} ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d | sed 's/^AWS://'"
+
+        ${HAL_COMMAND} config provider docker-registry enable
     ## Uncomment if you want to use a pre-created ConfigMap rather than feeding data in via helm.
     # name:
   ## Define custom profiles for Spinnaker services. Read more for details:
